@@ -269,9 +269,9 @@ class StringTest < MiniTest::Unit::TestCase
   end
 
   def cases
-    [ "aol", "aol_com", "att_net", "com", "comcast", "facebook_com", "googlemail", "gm", "gmail", "gmail_with_dots", "gmail_with_plus", 
-      "gmx_com", "googlemail_com", "hotmail", "hotmail_co_uk", "intl_gmail", "live_com", "mac_com", "mail_com", "me_com", 
-      "mil", "msn_com", "net", "org", "random_co", "sbcglobal", "tld_cn", "tld_co", "tld_coop", "tld_gr", "tld_jp", 
+    [ "aol", "aol_com", "att_net", "com", "comcast", "facebook_com", "googlemail", "gm", "gmail", "gmail_with_dots", "gmail_with_plus",
+      "gmx_com", "googlemail_com", "hotmail", "hotmail_co_uk", "intl_gmail", "live_com", "mac_com", "mail_com", "me_com",
+      "mil", "msn_com", "net", "org", "random_co", "sbcglobal", "tld_cn", "tld_co", "tld_coop", "tld_gr", "tld_jp",
       "verizon_net", "yahoo", "yahoo_co_uk", "ymail_com" ]
   end
 
@@ -279,10 +279,10 @@ class StringTest < MiniTest::Unit::TestCase
     i = 1
     cases.each do |test|
       eval("@bad_"+test).each do |email|
-        unless email.clean_up_typoed_email == (processed = eval("@good_"+test))
+        unless FatFingers.clean_up_typoed_email(email) == (processed = eval("@good_"+test))
           puts "#{i} - Failed on '#{email}'"
         end
-        assert_equal eval("@good_"+test), email.clean_up_typoed_email
+        assert_equal eval("@good_"+test), FatFingers.clean_up_typoed_email(email)
         i += 1
       end
     end
@@ -290,20 +290,19 @@ class StringTest < MiniTest::Unit::TestCase
 
   def test_that_good_emails_do_not_get_broken
     cases.each do |test|
-      assert_equal eval("@good_"+test), eval("@good_"+test).clean_up_typoed_email
+      assert_equal eval("@good_"+test), FatFingers.clean_up_typoed_email(eval("@good_"+test))
     end
   end
 
   def test_that_tlds_do_not_get_broken
     @all_tlds_fat_fingers_works_with.each do |tld|
-      assert_equal "test@something.#{tld}", "test@something.#{tld}".clean_up_typoed_email
+      assert_equal "test@something.#{tld}", FatFingers.clean_up_typoed_email("test@something.#{tld}")
     end
   end
 
   def test_the_four_obscure_tlds_fat_fingers_doesnt_work_with
     @tlds_fat_fingers_gets_tripped_on.each do |tld|
-      refute_equal "test@something.#{tld}", "test@something.#{tld}".clean_up_typoed_email
+      refute_equal "test@something.#{tld}", FatFingers.clean_up_typoed_email("test@something.#{tld}")
     end
   end
-
 end
